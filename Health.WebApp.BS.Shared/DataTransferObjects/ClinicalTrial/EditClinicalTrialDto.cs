@@ -25,7 +25,7 @@ namespace HealthManager.WebApp.BS.Shared.DataTransferObjects.Product
 
         [JsonPropertyName("endDate")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
         [JsonPropertyName("participants")]
         public int? Participants { get; set; } = 1;
