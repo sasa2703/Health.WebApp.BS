@@ -85,7 +85,7 @@ namespace HealthManager.WebApp.BS.Presentation.Tests.Services
         }
 
         [Fact]
-        public async void GetAllAvailableHealth_Returns_OK()
+        public async void CreateTrial_StatusOngoing_Returns_OKEndDate_And_Duration()
         {
             // Arrange
             var repositoryMock = new Mock<IRepositoryManager>();
@@ -96,7 +96,68 @@ namespace HealthManager.WebApp.BS.Presentation.Tests.Services
             var profile = new ClinicalTrialProfile();
             var configuration = new MapperConfiguration(cfg => cfg.AddProfile(profile));
             IMapper mapper = new Mapper(configuration);
-            var newHealth = new ClinicalTrialForCreationDto() {  Title = "NFS", StartDate = DateTime.UtcNow.AddDays(-3) };
+            var newHealth = new ClinicalTrialForCreationDto() { TrialId = "2", Title = "NFS", StartDate = DateTime.UtcNow.AddDays(-3), Status = "Ongoing" };
+            var validJson = JsonSerializer.Serialize(newHealth);
+            var file = CreateMockFormFile(validJson, "application/json");
+
+            repositoryMock
+                .Setup(r => r.Trial.CreateTrial(new ClinicalTrialMetadata { Title = "NFS", TrialId = "2", StartDate = DateTime.UtcNow.AddDays(-3) }));
+
+            var service = new TrialService(repositoryMock.Object, mapper, mockConfiguration.Object, _mockLogger.Object);
+            // Act
+            var health = await service.CreateTrialAsync(file);
+
+            // Assert
+            Assert.True(health.IsSuccess);
+            Assert.Empty(health.ErrorMessage);
+            Assert.NotNull(health.TrialDto);
+            Assert.Equal(health.TrialDto.EndDate, newHealth.StartDate.AddMonths(1));
+            Assert.Equal(health.TrialDto.Duration, (health.TrialDto.EndDate.Value - newHealth.StartDate).Days);
+            Assert.Equal("NFS", health.TrialDto.Title);
+        }
+
+        [Fact]
+        public async void CreateTrial_EndDateBefforeStartDate_Returns_Error()
+        {
+            // Arrange
+            var repositoryMock = new Mock<IRepositoryManager>();
+            var healthService = new Mock<ITrialService>();
+            var accessRightResolver = new Mock<IAccessRightsResolver>();
+            var mockConfiguration = new Mock<IConfiguration>();
+            mockConfiguration.Setup(config => config["FileUploadSettings:MaxFileSizeInMB"]).Returns("5");
+            var profile = new ClinicalTrialProfile();
+            var configuration = new MapperConfiguration(cfg => cfg.AddProfile(profile));
+            IMapper mapper = new Mapper(configuration);
+            var newHealth = new ClinicalTrialForCreationDto() { TrialId = "2", Title = "NFS", StartDate = DateTime.UtcNow.AddDays(-3), EndDate =DateTime.UtcNow.AddDays(-4), Status = "Ongoing" };
+            var validJson = JsonSerializer.Serialize(newHealth);
+            var file = CreateMockFormFile(validJson, "application/json");
+
+            repositoryMock
+                .Setup(r => r.Trial.CreateTrial(new ClinicalTrialMetadata { Title = "NFS", TrialId = "2", StartDate = DateTime.UtcNow.AddDays(-3) }));
+
+            var service = new TrialService(repositoryMock.Object, mapper, mockConfiguration.Object, _mockLogger.Object);
+            // Act
+            var health = await service.CreateTrialAsync(file);
+
+            // Assert
+            Assert.False(health.IsSuccess);
+            Assert.NotEmpty(health.ErrorMessage);
+            Assert.Equal(health.ErrorMessage, "StartDate cannot be after EndDate.");
+            
+        }
+
+        [Fact]
+        public async void GetAllAvailableHealth_Returns_OK()
+        {
+            // Arrange
+            var repositoryMock = new Mock<IRepositoryManager>();
+            var healthService = new Mock<ITrialService>();
+            var accessRightResolver = new Mock<IAccessRightsResolver>();
+            var mockConfiguration = new Mock<IConfiguration>();
+            mockConfiguration.Setup(config => config["FileUploadSettings:MaxFileSizeInMB"]).Returns("5");
+            var profile = new ClinicalTrialProfile();
+            var configuration = new MapperConfiguration(cfg => cfg.AddProfile(profile));
+            IMapper mapper = new Mapper(configuration);          
 
             repositoryMock
                 .Setup(r => r.Trial.GetAllAvailableTrials(false))

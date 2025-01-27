@@ -29,6 +29,7 @@ namespace HealthManager.WebApp.BS.Presentation.Controllers
 
         [HttpGet]
         [Authorize(Policy = "InternalUser")]
+        [SwaggerOperation(Summary = "Retrieves user by UserParameters.")]
         public async Task<IActionResult> GetUsers([FromQuery] UserParameters userParameters)
         {
             var pagedResult = await _service.GetAllUsersAsync(userParameters, trackChanges: false);
@@ -42,6 +43,7 @@ namespace HealthManager.WebApp.BS.Presentation.Controllers
 
         [HttpPatch("{username}/change-password")]
         [Authorize(Policy = "InternalOrEndUser")]
+        [SwaggerOperation(Summary = "Reset user password.")]
         public async Task<IActionResult> ResetUserPassword(string username, [FromBody] ChangePasswordDto model)
         {
             _auth.CheckPrincipalsUsername(User, username);
@@ -53,6 +55,7 @@ namespace HealthManager.WebApp.BS.Presentation.Controllers
 
         [HttpPost]
         [Authorize(Policy = "InternalUser")]
+        [SwaggerOperation(Summary = "Add User.")]
         public async Task<IActionResult> AddUser([FromBody] InvitedUserDto user)
         {
             if (!ModelState.IsValid)
@@ -65,6 +68,7 @@ namespace HealthManager.WebApp.BS.Presentation.Controllers
 
         [HttpGet("{id:int}")]
         [Authorize(Policy = "InternalOrEndUser")]
+        [SwaggerOperation(Summary = "Retrieves user by id.")]
         public async Task<IActionResult> GetUser(int id)
         {
             var user = await _service.GetUserAsync(id, trackChanges: false);
@@ -74,6 +78,7 @@ namespace HealthManager.WebApp.BS.Presentation.Controllers
 
         [HttpGet("{username}")]
         [Authorize(Policy = "InternalOrEndUser")]
+        [SwaggerOperation(Summary = "Retrieves user by username.")]
         public async Task<IActionResult> GetUserByUsername(string username)
         {
             var user = await _service.GetUserByUsernameAsync(username, trackChanges: false);
@@ -84,6 +89,7 @@ namespace HealthManager.WebApp.BS.Presentation.Controllers
 
         [HttpGet("me")]
         [Authorize(Policy = "InternalOrEndUser")]
+        [SwaggerOperation(Summary = "Retrieves data for logged in user.")]
         public async Task<IActionResult> GetLoggedInUserData()
         {
             var user = await _service.GetUserByUsernameAsync(ClaimsParser.ParseClaim(User, TokenClaims.Username), trackChanges: false);
@@ -93,6 +99,7 @@ namespace HealthManager.WebApp.BS.Presentation.Controllers
 
         [HttpDelete("{username}")]
         [Authorize(Policy = "InternalUser")]
+        [SwaggerOperation(Summary = "Delete user by username.")]
         public async Task<IActionResult> DeleteUser(string username)
         {
             await _auth.CheckPrincipalsRightsOnDelete(User, username);
@@ -103,6 +110,7 @@ namespace HealthManager.WebApp.BS.Presentation.Controllers
 
         [HttpPut("{id:int}")]
         [Authorize(Policy = "InternalOrEndUser")]
+        [SwaggerOperation(Summary = "Update user by id.")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UserForUpdateDto user)
         {
             if (user is null)
@@ -122,6 +130,7 @@ namespace HealthManager.WebApp.BS.Presentation.Controllers
 
         [HttpPatch("{id:int}")]
         [Authorize(Policy = "InternalUser")]
+        [SwaggerOperation(Summary = "Disable user bu id.")]
         public async Task<IActionResult> DisableUser(int id, [FromBody] JsonPatchDocument<UserForUpdateDto> patchDoc)
         {
             if (patchDoc is null)

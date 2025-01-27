@@ -28,7 +28,7 @@ namespace HealthManager.WebApp.BS.Entities.Models
 
         [JsonPropertyName("status")]
         [Required]
-        [EnumDataType(typeof(Statuses))]
+        [EnumDataType(typeof(Statuses),ErrorMessage = "Invalid status value. Allowed values: NotStarted, Ongoing, Completed.")]
         public string Status { get; set; }
 
         [JsonPropertyName("endDate")]
@@ -59,7 +59,7 @@ namespace HealthManager.WebApp.BS.Entities.Models
             {
                 EndDate = StartDate.AddMonths(1);
                 Duration = (EndDate.Value - StartDate).Days;
-            }
+            }        
         }
 
         public enum Statuses

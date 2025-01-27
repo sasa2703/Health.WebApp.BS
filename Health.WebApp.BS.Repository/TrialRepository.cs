@@ -2,6 +2,7 @@
 using HealthManager.WebApp.BS.Contracts;
 using HealthManager.WebApp.BS.Entities.Models;
 using HealthManager.WebApp.BS.Shared.RequestFeatures;
+using System.ComponentModel.DataAnnotations;
 
 namespace HealthManager.WebApp.BS.Repository
 {
@@ -50,7 +51,24 @@ namespace HealthManager.WebApp.BS.Repository
             }
         }
 
-        public void CreateTrial(ClinicalTrialMetadata trial) => Create(trial);
+        public void CreateTrial(ClinicalTrialMetadata trial) 
+        {
+            ValidateModel(trial);
+
+            Create(trial); 
+        }
+
+        private void ValidateModel<T>(T model)
+        {
+            var validationResults = new List<ValidationResult>();
+            var context = new ValidationContext(model);
+
+            if (!Validator.TryValidateObject(model, context, validationResults, validateAllProperties: true))
+            {
+                var errors = string.Join("; ", validationResults.Select(v => v.ErrorMessage));
+                throw new ValidationException($"Model validation failed: {errors}");
+            }
+        }
 
         public void UpdateTrial(ClinicalTrialMetadata trial) => Update(trial);
 

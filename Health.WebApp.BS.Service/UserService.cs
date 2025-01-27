@@ -9,6 +9,7 @@ using HealthManager.WebApp.BS.Shared.Exceptions.Auth0;
 using PasswordGenerator;
 using HealthManager.WebApp.BS.Shared.DataTransferObjects.User;
 using HealthManager.WebApp.BS.Shared.DataTransferObjects.Authentfication;
+using Microsoft.Extensions.Logging;
 
 namespace HealthManager.WebApp.BS.Service
 {
@@ -16,11 +17,13 @@ namespace HealthManager.WebApp.BS.Service
     {
         private readonly IRepositoryManager _repository;
         private readonly IMapper _mapper;
+        private readonly ILogger<UserService> _logger;
 
-        public UserService(IRepositoryManager repository, IMapper mapper)
+        public UserService(IRepositoryManager repository, IMapper mapper, ILogger<UserService> logger)
         {
             _repository = repository;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<(IEnumerable<UserDto> users, MetaData metaData)> GetAllUsersAsync(UserParameters userParameters, bool trackChanges)
@@ -129,9 +132,9 @@ namespace HealthManager.WebApp.BS.Service
             { 
                 await _repository.SaveAsync(); 
 
-            }catch
+            }catch(Exception ex)
             {
-               // _auth0Service.DeleteAuth0User(userModel.SAuthZeroUserId);
+                _logger.LogError($"Error adding user. Error: ${ex.Message}.");
                 throw;
             }
           
@@ -164,9 +167,9 @@ namespace HealthManager.WebApp.BS.Service
                 await _repository.SaveAsync();
 
             }
-            catch
+            catch(Exception ex)
             {
-                //TODO: LOG error here later
+                _logger.LogError($"Error reactivating user. Error: ${ex.Message}.");
             }
         }
 

@@ -117,19 +117,7 @@ namespace HealthManager.WebApp.BS.Service
                 _logger.LogError($"Failed to delete api access token with name {apiAccessToken.KeyVaultSecretId} from key vault. Error: ${e.Message}");
                 throw new Exception("Unable to delete access token from database.");
             }
-        }
-
-
-        private static byte[] Generate128BitsOfRandomEntropy()
-        {
-            var randomBytes = new byte[16]; // 16 Bytes will give us 128 bits.
-            using (var rngCsp = RandomNumberGenerator.Create())
-            {
-                // Fill the array with cryptographically secure random bytes.
-                rngCsp.GetBytes(randomBytes);
-            }
-            return randomBytes;
-        }
+        }        
 
         public async Task<ApiAccessTokenDto> GetToken(int id, ClaimsPrincipal user)
         {

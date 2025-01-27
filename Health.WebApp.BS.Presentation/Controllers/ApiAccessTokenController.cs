@@ -28,6 +28,7 @@ namespace HealthManager.WebApp.BS.Presentation.Controllers
 
         [HttpGet]
         [Authorize(Policy = "InternalOrEndUser")]
+        [SwaggerOperation(Summary = "Retrieves API access tokens.")]
         public async Task<IActionResult> GetApiAccessTokenPaged([FromQuery] ApiAccessTokenParameters apiAccessTokenRequestParameters)
         {
 
@@ -41,6 +42,7 @@ namespace HealthManager.WebApp.BS.Presentation.Controllers
 
         [HttpPost]
         [Authorize(Policy = "InternalOrEndUser")]
+        [SwaggerOperation(Summary = "Create API access token.")]
         public async Task<IActionResult> CreateApiAccessToken([FromBody] ApiAccessTokenForCreationDto apiAccessTokenForCreation)
         {
             if (apiAccessTokenForCreation is null)
@@ -64,6 +66,7 @@ namespace HealthManager.WebApp.BS.Presentation.Controllers
 
         [HttpDelete("{id}")]
         [Authorize(Policy = "InternalUser")]
+        [SwaggerOperation(Summary = "Delete API access token by ID.")]
         public async Task<IActionResult> DeleteApiAccessToken(int id)
         {         
             await _service.DeleteApiAccessTokenAsync(id, trackChanges: false);
@@ -74,7 +77,8 @@ namespace HealthManager.WebApp.BS.Presentation.Controllers
 
         [HttpGet("{apiAccessTokenId}", Name = "GetApiAccessToken")]
         [Authorize(Policy = "InternalOrEndUser")]
-        public async Task<IActionResult> GetApiAccessToken(int apiAccessTokenId, [FromQuery] ApiAccessTokenParameters billingAddressParameters)
+        [SwaggerOperation(Summary = "Retrieves api access token by apiAccessTokenId.")]
+        public async Task<IActionResult> GetApiAccessToken(int apiAccessTokenId)
         {
             var result = await _service.GetApiAccessTokenByIdAsync(apiAccessTokenId, trackChanges: false);
 
