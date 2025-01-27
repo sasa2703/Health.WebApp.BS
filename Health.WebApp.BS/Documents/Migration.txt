@@ -1,0 +1,1 @@
+﻿add-migration <migration_name> -p Health.WebApp.BS.Repository -s Health.WebApp.BS

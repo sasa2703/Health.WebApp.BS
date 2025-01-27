@@ -1,0 +1,3 @@
+﻿Build command:
+
+build -t health.webapp.bs .
